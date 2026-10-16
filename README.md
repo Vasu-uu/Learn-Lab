@@ -6,9 +6,13 @@ live demos, quizzes, spaced-repetition review and notes. No build step, no backe
 
 **Courses**
 
-| Course | Lessons | Live demos |
-|---|---|---|
-| Computer Vision: From Basics to Advanced | 18 + cheat sheets, glossary, interview questions | 100+ |
+| Category | Course | Lessons | Live demos |
+|---|---|---|---|
+| AI & Computer Vision | Computer Vision: From Basics to Advanced | 18 | 100+ |
+| Frameworks | Streamlit: Data apps in pure Python | 11 | 12 |
+| Frameworks | Flask: Web apps and APIs in Python | 12 | 15 |
+
+Every course also has a searchable cheat sheet, a glossary and interview-style flashcards.
 
 ## Run it
 
@@ -32,7 +36,6 @@ Then open http://localhost:5173.
   - reading tracker in the table of contents
   - "Check yourself" flip cards and a scored quiz with explanations
   - notes drawer (`N`), previous / next lesson (`←` `→`)
-  - use your own photo in the image demos (stays on your device)
 - **Review**: spaced repetition built from every lesson's self-check questions (`Space` to flip, `1`–`4` to grade)
 - **Notes**: every note in one searchable page, exportable as Markdown
 - **Search** across all courses (`Ctrl K` or `/`)
@@ -45,7 +48,7 @@ All progress, notes and review cards are stored in your browser's `localStorage`
 The in-app **Add a course** page has the full guide. In short:
 
 1. Copy `courses/_template` to `courses/<your-course>`.
-2. Edit `course.js` (id, title, parts, file list).
+2. Edit `course.js` (id, category, title, parts, file list). Courses with the same `category` are grouped together.
 3. Write lessons in Markdown inside `lessons.js` (`## Heading` starts a section).
 4. Add `'<your-course>'` to `courses/courses.js` and reload.
 
@@ -60,12 +63,13 @@ index.html                     app shell
 css/style.css                  design system (monochrome, light + dark)
 js/core.js                     course registry, Markdown renderer, canvas and plotting helpers
 js/app.js                      loader, router, dashboard, lessons, review, notes, search
+js/common-widgets.js           shared demos: reference tables, glossary, flashcards, checklists,
+                               mock app frames and code panels
 courses/courses.js             list of course folders to load
 courses/_template/             starter course to copy
-courses/computer-vision/
-  course.js                    course metadata and file list
-  content/part1-5.js           lessons, self-checks and quizzes
-  widgets/*.js                 interactive demos
+courses/computer-vision/       course.js, content/part1-5.js, widgets/*.js
+courses/streamlit/             course.js, lessons.js (Markdown), widgets/w-streamlit.js
+courses/flask/                 course.js, lessons.js (Markdown), widgets/w-flask.js
 ```
 
 ## Tech

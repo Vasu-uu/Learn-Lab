@@ -4,7 +4,7 @@
   const { table, w, ul, ol, tip } = h;
 
   /* ---------------- shared reference data ---------------- */
-  CV.REF = {
+  Object.assign(CV.REF, {
     formulas: {
       head: ['Concept', 'Formula'], mono: [1],
       rows: [
@@ -52,7 +52,7 @@
         ['OpenCV, scikit-image, Pillow, Kornia', 'classical processing, geometry, differentiable ops'], ['NumPy, SciPy, Matplotlib', 'arrays, numerics, plotting'], ['PyTorch, torchvision, PyTorch Lightning', 'deep learning, datasets, pretrained models'], ['timm', 'hundreds of pretrained image backbones'], ['Ultralytics', 'YOLO training, tracking, export'], ['Detectron2, MMDetection / MMSegmentation', 'research-grade detection and segmentation frameworks'], ['segmentation_models_pytorch', 'segmentation architectures with pretrained encoders'], ['Hugging Face Transformers, Diffusers, open_clip', 'ViT, DETR, CLIP, VLMs, diffusion'], ['Albumentations', 'fast augmentation including boxes and masks'], ['supervision, FiftyOne', 'visualisation, dataset curation and evaluation'], ['CVAT, Label Studio, Roboflow', 'annotation'], ['ONNX, TensorRT, OpenVINO, TFLite', 'deployment'], ['Weights & Biases, TensorBoard, MLflow', 'experiment tracking'], ['COLMAP, Open3D', '3D reconstruction and point clouds'],
       ],
     },
-  };
+  });
 
   CV.glossary = [
     ['Anchor', 'predefined box at a location used as a reference for box regression'],
@@ -127,6 +127,9 @@
     ]],
   ];
 
+  CV.GLOSSARIES.cv = CV.glossary;
+  CV.DECKS.cv = CV.INTERVIEW;
+
   /* ============================ Chapter 18 ============================ */
   CV.addChapter({
     n: 18, part: 5, minutes: 12,
@@ -174,7 +177,7 @@
     slug: 'glossary', part: 5, icon: 'Aa',
     title: 'Glossary',
     sub: 'Forty core terms, searchable.',
-    sections: [{ id: 'terms', title: 'Terms', html: w('glossary') }],
+    sections: [{ id: 'terms', title: 'Terms', html: w('glossary', { key: 'cv' }) }],
   });
 
   CV.addExtra({
@@ -182,7 +185,7 @@
     title: 'Interview Questions',
     sub: 'Self-tests on fundamentals, detection and segmentation, and advanced topics, as spaced flashcards.',
     sections: [
-      { id: 'cards', title: 'Flashcards', html: w('flashcards') },
+      { id: 'cards', title: 'Flashcards', html: w('flashcards', { deck: 'cv' }) },
       { id: 'all', title: 'All questions and answers', html: CV.INTERVIEW.map(([s, qs]) => `<h3>${s}</h3>${table(['Question', 'Answer'], qs)}`).join('') },
     ],
   });

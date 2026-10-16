@@ -31,6 +31,8 @@
     } catch (e) { console.error(e); loadErrors.push(e.message); }
   }
   CV.chapters.sort((a, b) => (a.course === b.course ? a.n - b.n : 0));
+  // keep courses of the same category together (in registry order) for the sidebar and dashboard
+  CV.courses.splice(0, CV.courses.length, ...CV.categories().flatMap(([, list]) => list));
 
   const lessonsOf = (cid) => CV.chapters.filter((c) => c.course === cid);
   const pagesOf = (cid) => [...lessonsOf(cid), ...CV.extras.filter((x) => x.course === cid)];
@@ -118,8 +120,10 @@
       <a class="nav-item" href="#/">${ICON.home}Dashboard</a>
       <a class="nav-item" href="#/review">${ICON.review}Review${nDue ? `<span class="badge">${nDue}</span>` : ''}</a>
       <a class="nav-item" href="#/notes">${ICON.notes}Notes</a>
-    </div><div class="nav-label">Courses</div>`;
+    </div>`;
+    let lastCat = null;
     for (const c of CV.courses) {
+      if (c.category !== lastCat) { html += `<div class="nav-label">${c.category}</div>`; lastCat = c.category; }
       const open = c.id === curCourse, pct = courseProgress(c.id);
       html += `<div class="nav-course ${open ? 'open' : ''}"><a class="nav-course-head" href="#/c/${c.id}"><span class="glyph">${c.glyph || c.title[0]}</span><span class="nc-t">${c.title}<small>${Math.round(pct * 100)}% complete</small></span></a>`;
       if (open) {
@@ -255,18 +259,18 @@
           <span class="btn btn-primary">${ICON.play}Resume</span></a></section>` : ''}
       <section class="wrap">
         <div class="sec-head"><h2>Your courses</h2><a href="#/guide" class="muted-link">How to add one →</a></div>
-        <div class="course-grid">
-          ${CV.courses.map((c) => {
+        ${CV.categories().map(([cat, list], ci, arr) => `<div class="cat-label">${cat}<span>${list.length} course${list.length > 1 ? 's' : ''}</span></div><div class="course-grid">
+          ${list.map((c) => {
             const L = lessonsOf(c.id), pct = courseProgress(c.id), nD = pagesOf(c.id).reduce((a, p) => a + demosIn(p), 0);
             const next = L.find((x) => !S.done[pid(x)]) || L[0];
             return `<div class="course-card reveal"><a class="cc-top" href="#/c/${c.id}"><div class="cc-glyph">${c.glyph || c.title[0]}</div>${ring(pct)}</a>
               <a href="#/c/${c.id}" class="cc-title"><h3>${c.title}</h3><p class="cc-sub">${c.subtitle || ''}</p></a>
               <p class="cc-desc">${c.desc || ''}</p>
-              <div class="cc-meta"><span>${L.length} lessons</span><span>${nD} demos</span><span>${L.reduce((a, x) => a + (x.minutes || 0), 0) / 60 | 0} h</span></div>
+              <div class="cc-meta"><span>${L.length} lessons</span><span>${nD} demos</span><span>${(L.reduce((a, x) => a + (x.minutes || 0), 0) / 60).toFixed(1)} h</span></div>
               <div class="cc-actions"><a class="btn btn-primary btn-sm" href="${next ? url(next) : '#/c/' + c.id}">${pct ? 'Continue' : 'Start'}${ICON.arrow}</a><a class="btn btn-sm" href="#/c/${c.id}">Syllabus</a></div></div>`;
           }).join('')}
-          <a class="course-card add-card reveal" href="#/guide"><div class="add-plus">${ICON.plus}</div><h3>Add your next course</h3><p class="cc-desc">Drop a new folder into <code>courses/</code>, or give Claude your next PDF and ask it to add the course.</p></a>
-        </div>
+          ${ci === arr.length - 1 ? `<a class="course-card add-card reveal" href="#/guide"><div class="add-plus">${ICON.plus}</div><h3>Add your next course</h3><p class="cc-desc">Drop a new folder into <code>courses/</code>, or give Claude your next PDF and ask it to add the course.</p></a>` : ''}
+        </div>`).join('')}
       </section>
       <section class="wrap two-col">
         <div class="panel reveal"><div class="sec-head"><h3>Study activity</h3><span class="muted">${Object.keys(S.days).length} active days</span></div>${heatmap()}<div class="hm-legend">less <i class="hm l0"></i><i class="hm l1"></i><i class="hm l2"></i><i class="hm l3"></i><i class="hm l4"></i> more</div></div>
@@ -349,7 +353,6 @@
         <div class="toc-card"><div class="toc-prog"><span>Reading</span><b id="readPct">0%</b></div><div class="pbar"><i id="readBar"></i></div></div>
         <h5>On this page</h5><ol>${toc.map(([i, t]) => `<li><a href="#" data-target="${i}"><span class="tick"></span>${t}</a></li>`).join('')}</ol>
         <button class="btn btn-sm btn-block" id="notesBtn">${ICON.notes} Notes${S.notes[id] ? ' •' : ''}</button>
-        ${nW ? `<div class="toc-card"><b>Image for demos</b><div class="row-btns"><button class="btn btn-sm" id="tocUpload">Use my photo</button>${U.hasUserImage() ? '<button class="btn btn-sm btn-ghost" id="tocReset">Reset</button>' : ''}</div></div>` : ''}
       </aside></div>
       <aside class="notes-drawer" id="notesDrawer"><div class="nd-head"><b>Notes</b><span class="muted small">${ch.title}</span><button class="icon-btn" id="ndClose" aria-label="Close notes">✕</button></div>
         <textarea id="ndText" placeholder="Write what you learned, questions, links… Saved automatically in this browser.">${U.esc(S.notes[id] || '')}</textarea><div class="nd-foot"><span id="ndSaved" class="muted small">${S.notes[id] ? 'Saved' : ''}</span><a href="#/notes" class="muted-link small">All notes →</a></div></aside>`);
@@ -369,8 +372,6 @@
     const eb = $('#enrollBtn');
     if (eb) eb.onclick = () => { const n = enroll(ch); eb.disabled = true; eb.textContent = '✓ In your review deck'; toast('+' + n, 'cards added to review'); renderNav(); };
     $$('.toc a').forEach((a) => (a.onclick = (e) => { e.preventDefault(); document.getElementById(a.dataset.target).scrollIntoView({ behavior: 'smooth' }); }));
-    const up = $('#tocUpload'); if (up) up.onclick = U.pickImage;
-    const tr = $('#tocReset'); if (tr) tr.onclick = U.resetImage;
     $('#notesBtn').onclick = () => openNotes();
     $('#ndClose').onclick = () => closeNotes();
     let tmr;
@@ -597,6 +598,7 @@ Put your next PDF or notes in this folder and ask Claude: *"Add this as a new co
 ${T}js
 CV.defineCourse({
   id: 'ml',                         // short, unique, used in URLs
+  category: 'AI & Computer Vision', // groups courses on the dashboard and sidebar
   title: 'Machine Learning',
   subtitle: 'Foundations',
   desc: 'One or two sentences shown on the dashboard.',
@@ -690,7 +692,7 @@ Any demo already in the platform can be reused with \`::demo name\` (for example
   const strip = (h) => h.replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/g, ' ').replace(/\s+/g, ' ').trim();
   const index = [];
   [...CV.chapters, ...CV.extras].forEach((p) => (p.sections || []).forEach((s) => index.push({ page: p, sec: s, title: s.title, text: strip(s.html) })));
-  (CV.glossary || []).forEach(([t, d]) => { const g = CV.extras.find((x) => x.slug === 'glossary'); g && index.push({ page: g, sec: { id: 'terms' }, title: t, text: d }); });
+  Object.entries(CV.GLOSSARIES || {}).forEach(([cid, terms]) => { const g = CV.extras.find((x) => x.slug === 'glossary' && x.course === cid); g && terms.forEach(([t, d]) => index.push({ page: g, sec: { id: 'terms' }, title: t, text: d })); });
 
   const modal = $('#searchModal'), input = $('#searchInput'), results = $('#searchResults');
   let sel = 0, hits = [];

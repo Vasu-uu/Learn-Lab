@@ -4,6 +4,7 @@
 */
 CV.defineCourse({
   id: 'my-course',                 // short, unique, used in URLs: #/c/my-course
+  category: 'Frameworks',          // courses with the same category are grouped together
   title: 'My Next Course',
   subtitle: 'From zero to useful',
   desc: 'One or two sentences that appear on the dashboard card.',

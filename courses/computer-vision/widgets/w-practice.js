@@ -69,21 +69,6 @@
     draw();
   });
 
-  /* ---------------- searchable reference table ---------------- */
-  CV.widget('ref-table', { title: 'Reference', desc: '', tag: 'Searchable' }, (body, opts) => {
-    const data = CV.REF[opts.key];
-    const inp = U.el('input', { placeholder: 'Filter…', type: 'text' });
-    body.append(U.el('div', { class: 'filter-row' }, inp));
-    const host = U.el('div'); body.append(host);
-    function draw() {
-      const q = inp.value.trim().toLowerCase();
-      const rows = data.rows.filter((r) => !q || r.join(' ').toLowerCase().includes(q));
-      host.innerHTML = `<div class="tbl-wrap" style="margin:0"><table><thead><tr>${data.head.map((x) => `<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => `<td${i && data.mono && data.mono.includes(i) ? ' style="font-family:var(--mono);font-size:13px"' : ''}>${c}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${data.head.length}" style="color:var(--text-3)">No matches</td></tr>`}</tbody></table></div>`;
-    }
-    inp.oninput = draw;
-    draw();
-  });
-
   /* ---------------- method chooser ---------------- */
   CV.widget('chooser', { title: 'Which method should I start with?', desc: 'Pick what you need to do.', tag: 'Decision helper' }, (body) => {
     const C = [
@@ -109,47 +94,4 @@
     });
   });
 
-  /* ---------------- glossary ---------------- */
-  CV.widget('glossary', { title: 'Glossary', desc: 'Filter by term or meaning.', tag: 'Searchable' }, (body) => {
-    const inp = U.el('input', { placeholder: 'Search 40 terms…', type: 'text' });
-    const count = U.el('span', { class: 'pill' });
-    body.append(U.el('div', { class: 'filter-row' }, inp, count));
-    const grid = U.el('div', { class: 'gloss-grid' }); body.append(grid);
-    function draw() {
-      const q = inp.value.trim().toLowerCase();
-      const items = CV.glossary.filter(([t, d]) => !q || t.toLowerCase().includes(q) || d.toLowerCase().includes(q));
-      count.textContent = `${items.length} shown`;
-      grid.innerHTML = items.map(([t, d], i) => `<div class="gloss" style="animation:pageIn .35s ${Math.min(i, 20) * 0.02}s both"><b>${t}</b><span>${d}</span></div>`).join('');
-    }
-    inp.oninput = draw;
-    draw();
-  });
-
-  /* ---------------- interview flashcards ---------------- */
-  CV.widget('flashcards', { title: 'Interview-style flashcards', desc: 'Say your answer out loud, flip, then mark how you did. Cards you miss come back sooner.', tag: 'Practice' }, (body) => {
-    const all = CV.INTERVIEW.flatMap(([sec, qs]) => qs.map(([q, a]) => ({ sec, q, a })));
-    let deck = all.slice(), i = 0, known = 0, again = 0, sec = 'all';
-    const top = U.el('div', { class: 'filter-row' }); body.append(top);
-    U.seg(top, [['all', 'All'], ...CV.INTERVIEW.map(([s]) => [s, s])], sec, (v) => { sec = v; deck = all.filter((c) => v === 'all' || c.sec === v); i = 0; known = again = 0; draw(); });
-    U.button(top, '🔀 Shuffle', () => { deck.sort(() => Math.random() - 0.5); i = 0; draw(); });
-    const stageEl = U.el('div', { class: 'flash-stage' }); body.append(stageEl);
-    const flip = U.el('div', { class: 'flip' });
-    const inner = U.el('div', { class: 'flip-inner' });
-    const front = U.el('div', { class: 'flip-face' }), back = U.el('div', { class: 'flip-face flip-back' });
-    inner.append(front, back); flip.append(inner);
-    flip.onclick = () => flip.classList.toggle('on');
-    const btns = U.el('div', { class: 'w-btns' });
-    const prog = U.el('div', { class: 'w-note', style: 'text-align:center' });
-    stageEl.append(prog, flip, btns);
-    U.button(btns, '✗ Again', () => { again++; deck.splice(Math.min(deck.length, i + 3), 0, deck[i]); next(); }, 'btn btn-sm');
-    U.button(btns, '✓ Got it', () => { known++; next(); }, 'btn btn-sm btn-primary');
-    function next() { flip.classList.remove('on'); setTimeout(() => { i++; if (i >= deck.length) { i = 0; CV.confetti(); } draw(); }, 250); }
-    function draw() {
-      const c = deck[i];
-      front.innerHTML = `<span class="q-n">${c.sec} · card ${i + 1} / ${deck.length}</span><div class="q-t">${c.q}</div><span class="hint" style="margin:14px auto 0">↻ tap to flip</span>`;
-      back.innerHTML = `<span class="q-n">Answer</span><div class="q-a">${c.a}</div>`;
-      prog.innerHTML = `<span style="color:var(--ok)">✓ ${known} known</span> · <span style="color:var(--warn)">↺ ${again} to revisit</span>`;
-    }
-    draw();
-  });
 })();

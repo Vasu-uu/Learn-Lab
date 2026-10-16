@@ -230,6 +230,10 @@ kbd { font-family: var(--mono); font-size: 11px; padding: 1px 6px; border-radius
 .cont-body small { color: var(--text-3); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
 .cont-body h3 { margin: 2px 0 10px; font-size: 18px; }
 
+.cat-label { display: flex; align-items: baseline; gap: 12px; margin: 30px 0 14px; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); }
+.cat-label:first-of-type { margin-top: 4px; }
+.cat-label span { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--text-3); }
+.cat-label::after { content: ""; flex: 1; height: 1px; background: var(--border); transform: translateY(-4px); }
 .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
 .course-card {
   position: relative; display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: 18px;

@@ -1,6 +1,7 @@
 /* Course: Computer Vision — From Basics to Advanced */
 CV.defineCourse({
   id: 'cv',
+  category: 'AI & Computer Vision',
   title: 'Computer Vision',
   subtitle: 'From Basics to Advanced',
   desc: 'Image fundamentals, classical vision, CNNs, detection, segmentation, vision transformers, foundation models, generative models and deployment, with every major architecture explained.',

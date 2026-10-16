@@ -16,7 +16,13 @@
 
   /* ---------------- courses ---------------- */
   CV.registerCourses = (folders) => { CV.courseFolders = folders; };
+  CV.categories = () => {
+    const m = new Map();
+    CV.courses.forEach((c) => { if (!m.has(c.category)) m.set(c.category, []); m.get(c.category).push(c); });
+    return [...m.entries()];
+  };
   CV.defineCourse = (def) => {
+    def.category = def.category || 'Courses';
     def.parts = def.parts || [{ n: 1, title: 'Lessons', desc: '' }];
     def.files = def.files || [];
     CV.courses.push(def);
@@ -524,7 +530,8 @@
       }
       if (l.trim().startsWith('|')) {
         const rows = []; while (i < lines.length && lines[i].trim().startsWith('|')) rows.push(lines[i++]);
-        const cells = (r) => r.trim().replace(/^\||\|$/g, '').split('|').map((c) => inline(c.trim()));
+        // split on unescaped pipes; "\|" inside a cell stays a literal pipe
+        const cells = (r) => r.trim().replace(/^\||\|$/g, '').split(/(?<!\\)\|/).map((c) => inline(c.trim().replace(/\\\|/g, '|')));
         const body = rows.filter((r, k) => !(k === 1 && /^[\s|:-]+$/.test(r)));
         out.push(H.table(cells(body[0]), body.slice(1).map(cells))); continue;
       }

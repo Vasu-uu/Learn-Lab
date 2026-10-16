@@ -45,7 +45,7 @@ All progress, notes and review cards are stored in your browser's `localStorage`
 
 ## Add a course
 
-The in-app **Add a course** page has the full guide. In short:
+To add a course yourself:
 
 1. Copy `courses/_template` to `courses/<your-course>`.
 2. Edit `course.js` (id, category, title, parts, file list). Courses with the same `category` are grouped together.

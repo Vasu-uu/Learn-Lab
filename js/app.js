@@ -140,7 +140,6 @@
       }
       html += '</div>';
     }
-    html += `<a class="nav-item add" href="#/guide">${ICON.plus}Add a course</a>`;
     $('#nav').innerHTML = html;
     $$('.nav-part-title').forEach((b) => (b.onclick = () => b.parentElement.classList.toggle('collapsed')));
     const h = location.hash || '#/';
@@ -168,7 +167,6 @@
     else if ((m = h.match(/^#\/c\/([\w-]+)/))) { curCourse = m[1]; CV.course(m[1]) ? renderCourse(CV.course(m[1])) : renderNotFound(); }
     else if (h.startsWith('#/review')) renderReview();
     else if (h.startsWith('#/notes')) renderNotes();
-    else if (h.startsWith('#/guide')) renderGuide();
     else renderDashboard();
     renderNav();
     paintChips();
@@ -258,8 +256,8 @@
           <div class="cont-body"><small>Continue · ${lastCourse.title}</small><h3>${last.n ? last.n + '. ' : ''}${last.title}</h3>${bar(courseProgress(last.course))}</div>
           <span class="btn btn-primary">${ICON.play}Resume</span></a></section>` : ''}
       <section class="wrap">
-        <div class="sec-head"><h2>Your courses</h2><a href="#/guide" class="muted-link">How to add one →</a></div>
-        ${CV.categories().map(([cat, list], ci, arr) => `<div class="cat-label">${cat}<span>${list.length} course${list.length > 1 ? 's' : ''}</span></div><div class="course-grid">
+        <div class="sec-head"><h2>Your courses</h2></div>
+        ${CV.categories().map(([cat, list]) => `<div class="cat-label">${cat}<span>${list.length} course${list.length > 1 ? 's' : ''}</span></div><div class="course-grid">
           ${list.map((c) => {
             const L = lessonsOf(c.id), pct = courseProgress(c.id), nD = pagesOf(c.id).reduce((a, p) => a + demosIn(p), 0);
             const next = L.find((x) => !S.done[pid(x)]) || L[0];
@@ -269,7 +267,6 @@
               <div class="cc-meta"><span>${L.length} lessons</span><span>${nD} demos</span><span>${(L.reduce((a, x) => a + (x.minutes || 0), 0) / 60).toFixed(1)} h</span></div>
               <div class="cc-actions"><a class="btn btn-primary btn-sm" href="${next ? url(next) : '#/c/' + c.id}">${pct ? 'Continue' : 'Start'}${ICON.arrow}</a><a class="btn btn-sm" href="#/c/${c.id}">Syllabus</a></div></div>`;
           }).join('')}
-          ${ci === arr.length - 1 ? `<a class="course-card add-card reveal" href="#/guide"><div class="add-plus">${ICON.plus}</div><h3>Add your next course</h3><p class="cc-desc">Drop a new folder into <code>courses/</code>, or give Claude your next PDF and ask it to add the course.</p></a>` : ''}
         </div>`).join('')}
       </section>
       <section class="wrap two-col">
@@ -570,93 +567,6 @@
       a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     };
     draw();
-  }
-
-  /* ---------------- guide: adding a course ---------------- */
-  function renderGuide() {
-    curCourse = null;
-    document.title = `Add a course — ${CV.PLATFORM}`;
-    const T = '```';
-    page(`<section class="wrap narrow"><div class="crumbs"><a href="#/">Dashboard</a><span>/</span><span>Add a course</span></div>
-      <h1 class="display">Add a course</h1>
-      <p class="lead">Every course is a folder. The platform finds it, builds the dashboard card, syllabus, lessons, quizzes, review cards and search for you.</p>
-      <div class="content guide">${CV.md(`
-### The quick way
-
-Put your next PDF or notes in this folder and ask Claude: *"Add this as a new course to my learning platform, in the same style as Computer Vision."* It will create the folder, lessons, quizzes and demos.
-
-### The manual way
-
-1. Copy the folder \`courses/_template\` to \`courses/your-course\` (any name, no spaces).
-2. Edit \`course.js\`: set a short \`id\`, the title, the parts, and the list of files.
-3. Write lessons in \`lessons.js\` using Markdown (see below).
-4. Add the folder name to \`courses/courses.js\`.
-5. Reload the page. Your course appears on the dashboard.
-
-### course.js
-
-${T}js
-CV.defineCourse({
-  id: 'ml',                         // short, unique, used in URLs
-  category: 'AI & Computer Vision', // groups courses on the dashboard and sidebar
-  title: 'Machine Learning',
-  subtitle: 'Foundations',
-  desc: 'One or two sentences shown on the dashboard.',
-  glyph: 'ML',                      // 1–3 letters for the course badge
-  parts: [{ n: 1, title: 'Basics' }, { n: 2, title: 'Models' }],
-  files: ['lessons.js'],            // loaded in this order
-});
-${T}
-
-### A lesson, written in Markdown
-
-${T}js
-CV.addChapter({
-  n: 1, part: 1, minutes: 12,
-  title: 'Linear regression',
-  sub: 'Fitting a line by least squares.',
-  md: \`
-## The idea
-We look for the line that minimises the **squared error**.
-
-$$ L = (1/N) Σ (y − ŷ)² $$
-
-> [!tip] Plot your data before fitting anything.
-
-| Term | Meaning |
-|---|---|
-| w | slope |
-| b | intercept |
-
-::demo overfit
-\`,
-  checks: [['What does least squares minimise?', 'The sum of squared residuals.']],
-  quiz: [{ q: 'Which loss is used?', o: ['MAE', 'MSE', 'Hinge'], a: 1, e: 'Mean squared error.' }],
-});
-${T}
-
-Each \`## heading\` becomes a section with its own entry in the table of contents and reading tracker.
-
-### Markdown you can use
-
-| Write | You get |
-|---|---|
-| \`## Title\` | a new section |
-| \`### Sub\` | a sub-heading |
-| \`**bold**\`, \`*italic*\`, \`==term==\` | emphasis and highlighted terms |
-| \`$$ formula $$\` | a formula block |
-| \`> [!key] …\` / \`[!tip]\` / \`[!warn]\` / \`[!note]\` | callout boxes |
-| \`::demo name\` | an interactive demo (any registered widget) |
-| fenced code with a language | code with a copy button |
-| rows starting and ending with a pipe | styled tables |
-
-### Interactive demos
-
-Any demo already in the platform can be reused with \`::demo name\` (for example \`softmax-ce\`, \`grad-descent\`, \`metrics\`, \`activations\`). New demos are small JavaScript files that call \`CV.widget(name, meta, mount)\`; see \`courses/computer-vision/widgets\` for many examples.
-
-> [!note] Progress, notes and review cards are stored in this browser only. Clearing site data resets them.
-`)}</div></section>`);
-    bindCode(main);
   }
 
   /* ---------------- scroll effects ---------------- */

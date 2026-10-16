@@ -1,0 +1,29 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors and local tooling
+.vscode/
+.idea/
+*.swp
+.claude/
+
+# Dependencies and builds (none needed today, kept for the future)
+node_modules/
+dist/
+build/
+.cache/
+
+# Python helpers / local servers
+__pycache__/
+*.pyc
+.venv/
+
+# Logs and env
+*.log
+.env
+.env.*
+
+# Source material (course PDFs stay local)
+*.pdf

@@ -69,7 +69,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: calc(var(--topbar-h) + 20px); }
+html { scroll-padding-top: calc(var(--topbar-h) + 20px); }
 body {
   margin: 0; font-family: var(--font); font-size: 16px; line-height: 1.7;
   color: var(--text); background: var(--bg);

@@ -97,7 +97,7 @@
     const html = document.documentElement;
     html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
     try { localStorage.setItem('ll-theme', html.dataset.theme); } catch (e) {}
-    const y = scrollY; route(true); scrollTo(0, y);
+    const y = scrollY; route(true); jumpTo(y);
   };
 
   /* ---------------- sidebar ---------------- */
@@ -172,7 +172,10 @@
     paintChips();
     if (!keepScroll) setReadProgress();
   }
-  addEventListener('hashchange', () => { route(); scrollTo(0, 0); });
+  // jump instantly: a smooth scroll here gets cut short by the new page's layout and fights the user's own scrolling
+  const jumpTo = (y) => scrollTo({ top: y, left: 0, behavior: 'instant' });
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  addEventListener('hashchange', () => { route(); jumpTo(0); });
 
   const page = (html) => { main.innerHTML = `<div class="page">${html}</div>`; };
   function renderNotFound() { page(`<section class="wrap"><h1 class="display">Not found</h1><p class="lead">That page does not exist. <a href="#/">Back to the dashboard</a>.</p></section>`); }
@@ -377,7 +380,7 @@
       clearTimeout(tmr);
       tmr = setTimeout(() => { const v = e.target.value; if (v.trim()) S.notes[id] = v; else delete S.notes[id]; S.notesAt = S.notesAt || {}; S.notesAt[id] = Date.now(); save(); $('#ndSaved').textContent = 'Saved'; }, 400);
     };
-    cleanups.push(U.onImage(() => { const y = scrollY; route(true); scrollTo(0, y); }));
+    cleanups.push(U.onImage(() => { const y = scrollY; route(true); jumpTo(y); }));
     const key = (e) => {
       if (/input|textarea|select/i.test(document.activeElement.tagName) || e.ctrlKey || e.metaKey || e.altKey || !$('#searchModal').hidden) return;
       if (e.key === 'ArrowRight' && next) location.hash = url(next);

@@ -274,7 +274,7 @@
   const sceneCache = {};
   const imgListeners = new Set();
   U.onImage = (fn) => { imgListeners.add(fn); return () => imgListeners.delete(fn); };
-  U.setUserImage = (img) => { userImage = img; Object.keys(sceneCache).forEach((k) => delete sceneCache[k]); imgListeners.forEach((f) => f()); };
+  U.setUserImage = (img) => { userImage = img; Object.keys(sceneCache).forEach((k) => delete sceneCache[k]); [...imgListeners].forEach((f) => f()); }; // copy: listeners re-register while re-rendering
   U.hasUserImage = () => !!userImage;
   U.pickImage = () => {
     const inp = U.el('input', { type: 'file', accept: 'image/*' });

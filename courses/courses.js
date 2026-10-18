@@ -6,6 +6,10 @@
   by their `category`; order here sets the order inside each group.
 */
 CV.registerCourses([
+  'artificial-intelligence',
+  'machine-learning',
+  'deep-learning',
+  'generative-ai',
   'computer-vision',
   'streamlit',
   'flask',

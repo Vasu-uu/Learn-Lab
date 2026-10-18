@@ -8,9 +8,13 @@ live demos, quizzes, spaced-repetition review and notes. No build step, no backe
 
 | Category | Course | Lessons | Live demos |
 |---|---|---|---|
-| AI & Computer Vision | Computer Vision: From Basics to Advanced | 18 | 100+ |
-| Frameworks | Streamlit: Data apps in pure Python | 11 | 12 |
-| Frameworks | Flask: Web apps and APIs in Python | 12 | 15 |
+| AI & Machine Learning | Artificial Intelligence: Foundations of intelligent systems | 11 | 12 |
+| AI & Machine Learning | Machine Learning: From data to deployed models | 12 | 17 |
+| AI & Machine Learning | Deep Learning: Neural networks from neurons to transformers | 10 | 31 |
+| AI & Machine Learning | Generative AI: LLMs, RAG, agents and diffusion | 10 | 19 |
+| AI & Machine Learning | Computer Vision: From Basics to Advanced | 18 | 100+ |
+| Frameworks | Streamlit: Data apps in pure Python | 11 | 15 |
+| Frameworks | Flask: Web apps and APIs in Python | 12 | 18 |
 
 Every course also has a searchable cheat sheet, a glossary and interview-style flashcards.
 
@@ -67,6 +71,10 @@ js/common-widgets.js           shared demos: reference tables, glossary, flashca
                                mock app frames and code panels
 courses/courses.js             list of course folders to load
 courses/_template/             starter course to copy
+courses/artificial-intelligence/  course.js, lessons.js (Markdown), widgets/w-ai.js
+courses/machine-learning/      course.js, lessons.js (Markdown), widgets/w-ml.js
+courses/deep-learning/         course.js, lessons.js (Markdown), widgets/w-dl.js
+courses/generative-ai/         course.js, lessons.js (Markdown), widgets/w-genai.js
 courses/computer-vision/       course.js, content/part1-5.js, widgets/*.js
 courses/streamlit/             course.js, lessons.js (Markdown), widgets/w-streamlit.js
 courses/flask/                 course.js, lessons.js (Markdown), widgets/w-flask.js
